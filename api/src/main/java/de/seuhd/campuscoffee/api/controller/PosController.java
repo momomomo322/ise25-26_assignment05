@@ -43,7 +43,7 @@ public class PosController {
     }
    
     @GetMapping("/filter")
-    public ResponseEntity<PosDto> getByName(@PathVariable String name) {
+    public ResponseEntity<PosDto> getByName(@RequestParam String name) {
         return ResponseEntity.ok(
             posDtoMapper.fromDomain(posService.getByName(name))
         );
