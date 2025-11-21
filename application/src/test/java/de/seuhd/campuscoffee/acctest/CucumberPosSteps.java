@@ -19,6 +19,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 import static de.seuhd.campuscoffee.TestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -91,7 +92,11 @@ public class CucumberPosSteps {
         assertThat(retrievedPosList).isEmpty();
     }
 
-    // TODO: Add Given step for new scenario
+    @Given("I insert the following POS elements")
+    public void iInsertTheFollowingPosElements(List<PosDto> elements) {
+        createdPosList = createPos(elements);
+        assertThat(createdPosList.size()).isEqualTo(elements.size());
+    }
 
     // When -----------------------------------------------------------------------
 
@@ -101,7 +106,18 @@ public class CucumberPosSteps {
         assertThat(createdPosList).size().isEqualTo(posList.size());
     }
 
-    // TODO: Add When step for new scenario
+
+    @When("I change the description of the POS called {string} to {string}")
+    public void iChangeTheDescriptionOfAPosToANewOne(String posName, String updatedDescription) {
+        PosDto targetPos = retrievePosByName(posName);
+
+        PosDto updatePos = targetPos.toBuilder()
+                .description(updatedDescription)
+                .build();
+        List<PosDto> updatedPosList = new ArrayList<PosDto>();
+        updatedPosList.add(updatePos);
+        updatePos(List.of(updatePos)).get(0);
+    }
 
     // Then -----------------------------------------------------------------------
 
@@ -113,5 +129,9 @@ public class CucumberPosSteps {
                 .containsExactlyInAnyOrderElementsOf(createdPosList);
     }
 
-    // TODO: Add Then step for new scenario
+    @Then("the POS element called {string} should have the description {string}")
+    public void thePOSElementCalledByNameShouldHaveUpdatedDescription(String posName, String updatedDescription) {
+        PosDto posByName = retrievePosByName(posName);
+        assertThat(posByName.description()).isEqualTo(updatedDescription);
+    }
 }
